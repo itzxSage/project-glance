@@ -7,28 +7,9 @@
       "path": "agent-memory/20-Projects/Harness-Fleet/Overview"
     },
     {
-      "name": "Cash-Mission",
-      "status": "active",
-      "source": "OpenViking agent-memory",
-      "path": "/Users/jrsgagne/.openviking/data/viking/default/resources/agent-memory/20-Projects/Cash-Mission/README.md"
-    },
-    {
-      "name": "Harness-Fleet",
-      "status": "active",
-      "source": "OpenViking agent-memory",
-      "path": "/Users/jrsgagne/.openviking/data/viking/default/resources/agent-memory/20-Projects/Harness-Fleet/README.md"
-    },
-    {
-      "name": "Hermes",
-      "status": "active",
-      "source": "OpenViking agent-memory",
-      "path": "/Users/jrsgagne/.openviking/data/viking/default/resources/agent-memory/20-Projects/Hermes/README.md"
-    },
-    {
-      "name": "LifeOS",
-      "status": "active",
-      "source": "OpenViking agent-memory",
-      "path": "/Users/jrsgagne/.openviking/data/viking/default/resources/agent-memory/20-Projects/LifeOS/README.md"
+      "name": "Unknown (vault unreadable)",
+      "status": "unknown",
+      "source": "vault path missing; set HERMES_OPENViking to the agent-memory dir"
     }
   ],
   "source": "OpenViking agent-memory vault (20-Projects)"
