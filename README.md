@@ -5,32 +5,35 @@ A live, auto-updating project dashboard for Jared: **Dashboard**, **Tasks**, a
 the native Kanban board, the OpenViking knowledge vault, and Google Calendar into
 one spot (replacing the old ChatGPT "space tab" workflow).
 
-The page is data-driven: it reads `/data/*.json` and re-fetches every 30 seconds,
-so any change to the data sources shows up automatically.
+The page is data-driven: it reads `/data/*.json` and re-fetches every 30 s, so any
+change to the data sources shows up automatically.
 
-## Run it locally (no install)
+---
+
+## Delivery (GitHub Pages)
+
+This repo (`itzxSage/project-glance`, main branch) holds the working site:
+
+- Static SPA (`index.html`, `app.js`, `styles.css`)
+- `data/` — generated task/knowledge/projects/calendar JSON
+- `.github/workflows/glance-sync.yml` — hourly auto-sync action
+
+To publish: GitHub **Settings → Pages → Deploy from a branch → main → `/**.**
+GitHub Pages then serves `https://itzxSage.github.io/project-glance/`. The hourly
+`Glance auto-sync` action keeps the site current: every run re-runs
+`python3 sync.py --demo`, commits any changed `data/` files to main, and Pages
+re-builds — so the site stays live and current without you touching it.
+
+---
+
+## Run locally (no install)
 
 ```bash
 python3 sync.py --demo    # regenerate data/*.json
-python3 serve.py          # → http://127.0.0.1:8000
+python3 serve.py          # -> http://127.0.0.1:8000
 ```
 
-Open http://127.0.0.1:8000 (the browser must fetch /data via http, so use `serve.py`
-rather than double-clicking `index.html`).
-
-## How the data flows
-
-```
-Kanban tasks  ──► data/tasks.json      (read from root kanban.json snapshot)
-OpenViking    ──► data/knowledge.json  (agent-memory/20-Projects vault)
-Curated repos ──► data/projects.json
-Google Calendar ─► data/calendar.json  (NOT WIRED — returns wired:false)
-```
-
-- `sync.py --demo` → regenerates everything and prints a quick summary.
-- `scripts/auto-sync.sh` → the same, safe to call from a scheduled job.
-- Point the auto-runner at `scripts/auto-sync.sh` (Hermes autotask or macOS cron)
-  so the page "updates as we go."
+---
 
 ## Views
 
@@ -39,25 +42,26 @@ Google Calendar ─► data/calendar.json  (NOT WIRED — returns wired:false)
 - **Tasks** — filterable/sortable list; inline title edit; "Work together" jump;
   done-toggle (does not write back to Kanban).
 - **Work Together** — shared notes feed + "Save note" (POSTs to `/api/notes`).
-- **Calendar** — shown only when calendar data exists; otherwise a clear "not
-  yet wired" card.
+- **Calendar** — shown only when calendar data exists; otherwise a clear "not yet
+  wired" card (see below).
 
-## Google Calendar
+---
 
-OAuth is **not configured**. `data/calendar.json` currently reports `wired:false`.
-Wiring needs a Google-account sign-in through the google-workspace skill
-(`gws_bridge.py` / `google_api.py`), then wiring `sync.py`'s `calendar_adapter()`.
-No real events are invented.
+## Google Calendar (the one consent gate)
 
-## Deploy (appoint deploy path — no hosting claimed here)
+Calendar wiring needs **your Google account sign-in** — no data is invented.
 
-The site is a static SPA + `data/*.json`; any static host works. The low-cost,
-no-new-subscription path is GitHub Pages under this repo. Suggested CI:
-a GitHub Action that runs `sync.py --demo` and publishes the `data/` + static
-files to the `gh-pages` site. Exchange `jared-project-glance` with Jared's chosen
-host/domain. **This repo is a new, ownable Project Glance. The existing
-`https://jared-project-glance.jrsgagne.chatgpt.site` is a separate site and must
-not be overwritten without an explicit go-ahead.**
+1. Run the Google Workspace skill's auth setup:
+   ```bash
+   cd /Users/jrsgagne/.hermes/skills/productivity/google-workspace
+   python3 setup.py --auth-url        # complete the browser consent
+   ```
+2. Make sure the `gws` CLI is available (the same setup), then any later `sync.py
+   --demo` will pull real calendar events and flip `calendar_wired` to `true`.
+
+Until that happens the app shows a clear placeholder so nothing looks filled in by
+guess. When you come back, run `python3 sync.py --demo` again and the calendar
+view will populate.
 
 ## Source ownership (authoritative truth today)
 
@@ -65,7 +69,7 @@ not be overwritten without an explicit go-ahead.**
   a scheduled refresher rewrites it when Kanban changes.
 - Knowledge → OpenViking `agent-memory/20-Projects` vault (canonical durable KB).
 - Projects → curated `itzxSage` repo index + vault entries.
-- Calendar → Google via Google Workspace CLI (not yet wired).
+- Calendar → Google via Google Workspace CLI (consent-gated, see above).
 
 ## Legacy
 
