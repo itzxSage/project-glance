@@ -31,6 +31,14 @@ re-builds — so the site stays live and current without you touching it.
 ```bash
 python3 sync.py --demo    # regenerate data/*.json
 python3 serve.py          # -> http://127.0.0.1:8000
+
+Kanban tasks in the dashboard come from the repo root `kanban.json` (the live-native
+Kanban snapshot). If it is absent, sync.py falls back to the built-in snapshot so the
+site is never empty. Drop your exported `kanban.json` into the repo root and the hourly
+auto-sync action will pick up any native-Kanban change and push it to `main`.
+
+The auto-sync pipeline is: sync.py --demo -> commit changed data/ -> push main -> Pages
+re-build. So it updates as Kanban (or the vault, or repos) change, with no manual rebuild.
 ```
 
 ---
