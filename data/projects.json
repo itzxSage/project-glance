@@ -1,0 +1,71 @@
+{
+  "repos": [
+    {
+      "name": "dot-mailbox",
+      "owner": "itzxSage",
+      "desc": "Private, on-demand exchange of approved project updates",
+      "public": false
+    },
+    {
+      "name": "personal-secretary",
+      "owner": "itzxSage",
+      "desc": "Private Life Engine: goals, memory, scheduling, voice/conversation contracts",
+      "public": true
+    },
+    {
+      "name": "agent-os",
+      "owner": "itzxSage",
+      "desc": "Agent OS",
+      "public": false
+    },
+    {
+      "name": "cash-mission",
+      "owner": "itzxSage",
+      "desc": "Cash Fleet mission code (private)",
+      "public": false
+    },
+    {
+      "name": "budget-bridge",
+      "owner": "itzxSage",
+      "desc": "Headless manual and CSV budgeting ledger with MCP tools",
+      "public": true
+    },
+    {
+      "name": "omo-drive",
+      "owner": "itzxSage",
+      "desc": "Voice-driven remote interface for OpenCode",
+      "public": true
+    },
+    {
+      "name": "tabernacle-prayer",
+      "owner": "itzxSage",
+      "desc": "First-person, seven-stop Tabernacle prayer walkthrough",
+      "public": true
+    },
+    {
+      "name": "hermes-friend-starter",
+      "owner": "itzxSage",
+      "desc": "Portable Codex setup kit for an independent Windows Hermes",
+      "public": false
+    },
+    {
+      "name": "q-oauth-prototype",
+      "owner": "itzxSage",
+      "desc": "OAuth prototype for Q",
+      "public": false
+    },
+    {
+      "name": "q-mobilebuildmcp-pilot",
+      "owner": "itzxSage",
+      "desc": "Q mobile build MCP pilot",
+      "public": false
+    }
+  ],
+  "vault_projects": [
+    {
+      "name": "Unknown (vault unreadable)",
+      "status": "unknown",
+      "source": "vault path missing"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Glance</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Project Glance</div>
+    <nav>
+      <a href="#dashboard" data-view="dashboard">Dashboard</a>
+      <a href="#tasks" data-view="tasks">Tasks</a>
+      <a href="#work" data-view="work">Work Together</a>
+      <a href="#calendar" data-view="calendar">Calendar</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="view-dashboard" class="view">
+      <div class="card" id="dashboard-card"></div>
+    </section>
+
+    <section id="view-tasks" class="view" hidden>
+      <div class="card">
+        <h2>Tasks</h2>
+        <div class="toolbar">
+          <select id="filter-status" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="done">Done</option>
+            <option value="todo">To do</option>
+            <option value="in-progress">In progress</option>
+            <option value="blocked">Blocked</option>
+            <option value="scheduled">Scheduled</option>
+          </select>
+          <select id="filter-assignee" aria-label="Filter by assignee">
+            <option value="all">All assignees</option>
+          </select>
+          <select id="sort-by" aria-label="Sort">
+            <option value="priority-desc">Priority (&darr;)</option>
+            <option value="priority-asc">Priority (&uarr;)</option>
+            <option value="title">Title</option>
+          </select>
+        </div>
+        <ul id="task-list" class="task-list"></ul>
+      </div>
+    </section>
+
+    <section id="view-work" class="view" hidden>
+      <div class="card">
+        <h2>Work Together</h2>
+        <p class="muted">This page is the shared workspace for me and Jared. Keep notes copy-ready and non-sensitive.</p>
+        <div id="notes-feed" class="notes-feed"></div>
+        <form id="note-form">
+          <textarea id="note-text" rows="3" placeholder="Add a shared note&hellip;"></textarea>
+          <button type="submit" class="primary">Save note</button>
+        </form>
+        <p class="muted" id="note-saved" role="status"></p>
+      </div>
+    </section>
+
+    <section id="view-calendar" class="view" hidden>
+      <div class="card" id="calendar-card"></div>
+    </section>
+  </main>
+
+  <footer class="topbar">
+    <span class="muted" id="refresh-hint">Loading&hellip;</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

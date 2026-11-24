@@ -1,0 +1,10 @@
+{
+  "projects": [
+    {
+      "name": "Unknown (vault unreadable)",
+      "status": "unknown",
+      "source": "vault path missing"
+    }
+  ],
+  "source": "OpenViking agent-memory vault (20-Projects)"
+}
