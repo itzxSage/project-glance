@@ -1,0 +1,36 @@
+name: Glance auto-sync
+
+# Regenerates Project Glance data from the Kanban snapshot on a schedule and
+# redeploys to GitHub Pages, so the site stays current "as we go."
+#
+# Triggers: hourly cron + manual `workflow_dispatch`.
+# Requires: no secrets (uses GITHUB_TOKEN for the commit).
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # hourly
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Regenerate data
+        run: python3 sync.py --demo
+
+      - name: Commit and push regenerated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Glance: auto-sync data $(date -u +%Y-%m-%dT%H:%M:%SZ)" || echo "no changes"
+          git push origin main
