@@ -18,6 +18,8 @@ Stdlib only. No third-party deps.
 """
 import json
 import os
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -158,9 +160,53 @@ def projects_adapter():
 
 
 def calendar_adapter():
-    # Google Calendar is NOT yet wired. OAuth requires a browser sign-in; not configured.
+    """Google Calendar "hooked up": auto-detects a Google OAuth token + the `gws` CLI.
+    When both are present it pulls real events; otherwise it returns a clear
+    "not yet wired" placeholder. Nothing is ever invented, so events only appear
+    after consent + a valid token exist.
+
+    To make it fire: (1) `python3 setup.py --auth-url` and complete the Google
+    consent; (2) install the `gws` CLI (google-workspace skill setup). Then re-run
+    sync.py — calendar_wired flips True with real events.
+    """
+    import shutil
+    token = None
+    for candidate in (Path(os.environ.get("HERMES_HOME", str(Path.home() / ".hermes"))) / "google_token.json",
+                      Path.home() / ".hermes" / "google_token.json"):
+        if candidate.exists():
+            token = candidate
+            break
+    gws = shutil.which("gws")
+
+    if token is not None and gws is not None:
+        try:
+            out = subprocess.run(
+                [sys.executable, str(ROOT / "gws_bridge.py"), "gws", "calendar", "list",
+                 "--time-zone=America/Chicago", "--max-results=20"],
+                capture_output=True, text=True, timeout=30, env=os.environ.copy(),
+            )
+            entries = _parse_gws_calendar(out)
+            return {"entries": entries, "wired": True,
+                    "note": "Calendar wired (Google OAuth connected)."}
+        except Exception as e:
+            return {"entries": [], "wired": False,
+                    "note": f"Calendar bridge raised ({e}); re-run the Google Workspace setup."}
+
     return {"entries": [], "wired": False,
-            "note": "Calendar not yet wired (Google Calendar via Google Workspace CLI, OAuth not configured). No events invented."}
+            "note": ("Calendar not yet wired. Complete Google sign-in "
+                     "(setup.py --auth-url) and install `gws`; the adapter flips wired on with real events.")}
+
+
+def _parse_gws_calendar(result):
+    """Best-effort calendar event extraction from a gws calendar list response."""
+    import json as _json
+    text = (result.stdout or "") + (result.stderr or "")
+    try:
+        data = _json.loads(text)
+        items = data if isinstance(data, list) else data.get("items") or data.get("events") or []
+        return items
+    except Exception:
+        return []
 
 
 def write_json(name, obj):
@@ -172,15 +218,16 @@ def demo():
     write_json("tasks.json", kanban_adapter()["tasks"])
     write_json("knowledge.json", knowledge_adapter())
     write_json("projects.json", projects_adapter())
-    write_json("calendar.json", calendar_adapter())
+    cal = calendar_adapter()
+    write_json("calendar.json", cal)
     t = kanban_adapter()
     k = knowledge_adapter()
     print(json.dumps({
         "task_count": t["count"],
         "knowledge_projects": len(k["projects"]),
         "repo_count": len(projects_adapter()["repos"]),
-        "calendar_entries": 0,
-        "calendar_wired": False,
+        "calendar_entries": len(cal["entries"]),
+        "calendar_wired": cal["wired"],
         "data_dir": str(DATA),
     }, indent=2))
 

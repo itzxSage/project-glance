@@ -1,5 +1,5 @@
 {
   "entries": [],
   "wired": false,
-  "note": "Calendar not yet wired (Google Calendar via Google Workspace CLI, OAuth not configured). No events invented."
+  "note": "Calendar not yet wired. Complete Google sign-in (setup.py --auth-url) and install `gws`; the adapter flips wired on with real events."
 }
