@@ -121,21 +121,40 @@ def kanban_adapter():
     return {"tasks": tasks, "count": len(tasks), "source": "kanban.json (native Kanban snapshot)"}
 
 
+def _vault_roots():
+    # Canonical OpenViking agent-memory vault -> 20-Projects/*. Each subdir is a project.
+    ov = Path(os.environ.get("HERMES_OPENViking", str(
+        Path.home() / ".openviking" / "data" / "viking" / "default" / "resources" / "agent-memory")))
+    return [ov, ROOT / "agent-memory" / "20-Projects",
+            Path.home() / ".hermes" / "knowledge" / "projects" / "agent-memory"]
+
+
 def _vault_projects():
     projects = []
-    base = ROOT / "agent-memory" / "20-Projects"
-    if not base.exists():
-        return [{"name": "Unknown (vault unreadable)", "status": "unknown", "source": "vault path missing"}]
-    for d in sorted(base.iterdir()):
-        if not d.is_dir():
+    seen = set()
+    for base in _vault_roots():
+        if not base.is_dir():
             continue
-        readme = d / "README.md"
-        entry = {"name": d.name, "status": "active", "source": "agent-memory", "path": str(readme)}
-        if readme.exists():
-            text = readme.read_text(errors="replace")
-            entry["desc"] = " ".join(text.splitlines()[2:4])[:160]
-        projects.append(entry)
-    projects.insert(0, {"name": "Harness-Fleet validation", "status": "active", "source": "agent-memory", "path": "agent-memory/20-Projects/Harness-Fleet/Overview"})
+        # The vault's real project roots live under its "20-Projects/" subfolder;
+        # fall back to the root itself if a plain vault root is handed in.
+        src = base / "20-Projects" if (base / "20-Projects").is_dir() else base
+        if not src.is_dir():
+            continue
+        for d in sorted(p for p in src.iterdir() if p.is_dir()):
+            if d in seen:
+                continue
+            seen.add(d)
+            entry = {"name": d.name, "status": "active", "source": "OpenViking agent-memory", "path": str(d / "README.md")}
+            readme = d / "README.md"
+            if readme.exists():
+                text = readme.read_text(encoding="utf-8", errors="replace").splitlines()
+                entry["brief"] = next((ln.strip() for ln in text if ln.strip()), "")[:160]
+            projects.append(entry)
+    if not projects:
+        projects = [{"name": "Unknown (vault unreadable)",
+                     "status": "unknown",
+                     "source": "vault path missing; set HERMES_OPENViking to the agent-memory dir"}]
+    projects.insert(0, {"name": "Harness-Fleet validation", "status": "active", "source": "OpenViking agent-memory", "path": "agent-memory/20-Projects/Harness-Fleet/Overview"})
     return projects
 
 
